@@ -1,21 +1,40 @@
 {
   "id": "flux-image-generator",
   "name": "Flux Image Generator",
-  "description": "Generate images using Flux models (flux-dev, flux-pro, flux-schnell) via Fal.ai.",
   "version": "1.0.0",
-  "author": "King",
-
+  "description": "Generate images using Flux models (flux-dev, flux-pro, flux-schnell) via Fal.ai",
   "type": "custom-plugin",
   "implementationType": "javascript",
-  "action": "run",
+  "author": "King",
+
+  "actions": [
+    {
+      "id": "run",
+      "name": "Generate Image",
+      "description": "Generate an image using the selected Flux model.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "type": "string",
+            "description": "Image description",
+            "required": true
+          },
+          "negative_prompt": {
+            "type": "string",
+            "description": "Things to avoid"
+          }
+        }
+      }
+    }
+  ],
 
   "userSettings": [
     {
       "name": "falKey",
       "label": "Fal.ai API Key",
       "type": "password",
-      "required": true,
-      "description": "Your Fal.ai API key (get it from https://fal.ai)"
+      "required": true
     },
     {
       "name": "model",
@@ -39,20 +58,6 @@
       "label": "Height",
       "type": "number",
       "defaultValue": 1024
-    }
-  ],
-
-  "inputs": [
-    {
-      "id": "prompt",
-      "label": "Prompt",
-      "type": "text",
-      "required": true
-    },
-    {
-      "id": "negative_prompt",
-      "label": "Negative Prompt",
-      "type": "text"
     }
   ]
 }
