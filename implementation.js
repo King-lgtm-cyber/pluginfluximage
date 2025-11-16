@@ -1,12 +1,26 @@
-export async function run(params, context) {
-  const prompt = params.prompt;
-  const negative = params.negative_prompt || "";
+function escapeMarkdownAlt(text) {
+  if (!text) return "";
+  return text
+    .replace(/\\/g, "\\\\")
+    .replace(/\n/g, " ")
+    .replace(/\[/g, "\\[")
+    .replace(/\]/g, "\\]")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
 
-  const model = context.settings.model || "flux-dev";
-  const width = context.settings.width || 1024;
-  const height = context.settings.height || 1024;
+async function flux_image_generator(params, userSettings) {
+  const { prompt, negative_prompt = "" } = params;
+  const falKey = userSettings.falKey;
+  const model = userSettings.model || "flux-dev";
+  const width = userSettings.width || 1024;
+  const height = userSettings.height || 1024;
+  const steps = userSettings.steps || 28;
+  const cfg = userSettings.cfg || 7;
 
-  const falKey = context.settings.falKey;
+  if (!falKey) {
+    throw new Error("Missing FAL API key. Add it in plugin settings.");
+  }
 
   const endpoints = {
     "flux-dev": "https://fal.run/fal-ai/flux-dev",
@@ -15,28 +29,44 @@ export async function run(params, context) {
   };
 
   const endpoint = endpoints[model];
+  if (!endpoint) {
+    throw new Error(`Unknown model: ${model}`);
+  }
 
   const payload = {
     prompt,
-    negative_prompt: negative,
+    negative_prompt,
     width,
-    height
+    height,
+    steps,
+    guidance_scale: cfg
   };
 
-  const res = await fetch(endpoint, {
+  const response = await fetch(endpoint, {
     method: "POST",
     headers: {
-      "Authorization": `Key ${falKey}`,
+      Authorization: `Key ${falKey}`,
       "Content-Type": "application/json"
     },
     body: JSON.stringify(payload)
   });
 
-  if (!res.ok) {
-    throw new Error(await res.text());
+  if (response.status === 401) {
+    throw new Error("Invalid FAL API key.");
   }
 
-  const json = await res.json();
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText);
+  }
 
-  return `![Generated Image](${json.images[0]})`;
+  const data = await response.json();
+  if (!data.images || data.images.length === 0) {
+    throw new Error("No image returned by the Flux API.");
+  }
+
+  const url = data.images[0].url;
+  const alt = escapeMarkdownAlt(prompt);
+
+  return `![${alt}](${url})\n\n_Note: Save the image within 1 hour, or it will expire._`;
 }
