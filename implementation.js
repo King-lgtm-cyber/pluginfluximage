@@ -1,77 +1,61 @@
-function escapeAlt(text) {
-  if (!text) return "";
-  return text
-    .replace(/\\/g, "\\\\")
-    .replace(/\n/g, " ")
-    .replace(/\[/g, "\\[")
-    .replace(/\]/g, "\\]")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-}
+export default async function generateImage(inputs, context) {
+  const { model, prompt, negative_prompt, width, height, steps, cfg, seed } = inputs;
 
-/**
- * Main function called by TypingMind.
- * The name MUST be generate_flux_image to match plugin.json.
- */
-async function generate_flux_image(params, userSettings) {
-  const prompt = params?.prompt || "Untitled Flux image";
+  // Map model to its Fal.ai endpoint
+  const endpoints = {
+    "flux-dev": "https://fal.run/fal-ai/flux-dev",
+    "flux-pro": "https://fal.run/fal-ai/flux-pro",
+    "flux-schnell": "https://fal.run/fal-ai/flux-schnell"
+  };
 
-  const falApiKey = userSettings?.falApiKey;
-  const defaultModel = userSettings?.defaultModel || "flux-pro";
-  const width = Number(userSettings?.width || 1024) || 1024;
-  const height = Number(userSettings?.height || 1024) || 1024;
+  const endpoint = endpoints[model];
 
-  if (!falApiKey) {
-    throw new Error("Please set your FAL.ai API key in the plugin settings.");
+  if (!endpoint) {
+    throw new Error(`Unknown model selected: ${model}`);
   }
 
-  // Map dropdown model → fal model id
-  const modelMap = {
-    "flux-pro": "fal-ai/flux-pro/v1.1",
-    "flux-dev": "fal-ai/flux/dev",
-    "flux-schnell": "fal-ai/flux/schnell"
+  const falKey = context.env.FAL_KEY;
+
+  if (!falKey) {
+    throw new Error(
+      "Fal.ai API key missing. Please add FAL_KEY to TypingMind environment variables."
+    );
+  }
+
+  const payload = {
+    prompt: prompt,
+    negative_prompt: negative_prompt || "",
+    width: width || 1024,
+    height: height || 1024,
+    steps: steps || 28,
+    guidance_scale: cfg || 7,
+    seed: seed || 0
   };
 
-  const modelId = modelMap[defaultModel] || modelMap["flux-pro"];
-
-  const apiUrl = `https://fal.run/${modelId}`;
-
-  const body = {
-    input: {
-      prompt,
-      image_size: `${width}x${height}`,
-      num_inference_steps: 8,
-      guidance_scale: 2
-    }
-  };
-
-  const response = await fetch(apiUrl, {
+  // Make request to Fal.ai
+  const res = await fetch(endpoint, {
     method: "POST",
     headers: {
-      "Authorization": `Key ${falApiKey}`,
+      "Authorization": `Key ${falKey}`,
       "Content-Type": "application/json"
     },
-    body: JSON.stringify(body)
+    body: JSON.stringify(payload)
   });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`FAL API error ${response.status}: ${errorText.slice(0, 400)}`);
+  if (!res.ok) {
+    const errorText = await res.text();
+    throw new Error(`Flux API error: ${errorText}`);
   }
 
-  const data = await response.json();
+  const json = await res.json();
 
-  // Try common fal shapes: result.data.images[0].url etc.
-  const imageUrl =
-    data?.data?.images?.[0]?.url ||
-    data?.images?.[0]?.url ||
-    null;
-
-  if (!imageUrl) {
-    console.error("Unexpected FAL response:", data);
-    throw new Error("Could not find an image URL in the FAL response.");
+  // Return direct URL (fastest)
+  if (json?.images && json.images.length > 0) {
+    return {
+      type: "image",
+      url: json.images[0].url
+    };
   }
 
-  const alt = escapeAlt(prompt).slice(0, 120);
-  return `![${alt}](${imageUrl})`;
+  throw new Error("No image returned by Flux model.");
 }
