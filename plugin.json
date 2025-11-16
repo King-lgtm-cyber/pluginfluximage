@@ -1,47 +1,55 @@
 {
-  "id": "flux-image-generator",
-  "name": "Flux Image Generator",
-  "description": "Generate images using Flux models (flux-dev, flux-pro, flux-schnell) via Fal.ai.",
-  "version": "1.0.0",
-  "author": "King",
-  "type": "custom-plugin",
-  "api": {
-    "type": "custom"
-  },
-  "action": "run",
-  "inputs": [
+  "id": "flux_image_generator",
+  "uuid": "d8a44cd1-621f-4b87-bf1b-8c4cb29cbfa0",
+  "emoji": "⚡️",
+  "title": "Flux Image Generator",
+  "description": "Generate images using Flux (flux-dev, flux-pro, flux-schnell) via Fal.ai.",
+  "userSettings": [
     {
-      "id": "model",
+      "name": "falKey",
+      "required": true,
+      "type": "password",
+      "label": "Fal.ai API Key",
+      "description": "Get your Fal.ai API key: https://fal.ai"
+    },
+    {
+      "name": "model",
+      "type": "string",
       "label": "Flux Model",
-      "type": "select",
-      "options": [
-        { "label": "flux-dev", "value": "flux-dev" },
-        { "label": "flux-pro", "value": "flux-pro" },
-        { "label": "flux-schnell", "value": "flux-schnell" }
-      ],
-      "default": "flux-dev"
+      "description": "Choose which Flux model to use (flux-dev, flux-pro, flux-schnell)",
+      "defaultValue": "flux-dev"
     },
     {
-      "id": "prompt",
-      "label": "Prompt",
-      "type": "text",
-      "placeholder": "Describe the image you want to create...",
-      "required": true
-    },
-    {
-      "id": "negative_prompt",
-      "label": "Negative Prompt",
-      "type": "text",
-      "placeholder": "Things to avoid..."
-    },
-    {
-      "id": "width",
-      "label": "Width",
+      "name": "width",
       "type": "number",
-      "default": 1024
+      "label": "Image Width",
+      "defaultValue": 1024
     },
     {
-      "id": "height",
-      "label": "Height",
+      "name": "height",
       "type": "number",
-      "default": 1024
+      "label": "Image Height",
+      "defaultValue": 1024
+    }
+  ],
+  "openaiSpec": {
+    "name": "flux_image_generator",
+    "description": "Generate an image using Flux via Fal.ai.",
+    "parameters": {
+      "type": "object",
+      "required": ["prompt"],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "The image prompt"
+        },
+        "negative_prompt": {
+          "type": "string",
+          "description": "Things to avoid"
+        }
+      }
+    }
+  },
+  "implementationType": "javascript",
+  "outputType": "render_markdown"
+}
