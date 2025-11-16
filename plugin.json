@@ -1,67 +1,72 @@
 {
+  "name": "Flux Image Generator (FAL.ai)",
   "version": 1,
-  "uuid": "e7c9f1b0-3b0d-4d4a-9e33-2a5b7f41f999",
-  "emoji": "🎨",
-  "iconURL": "",
-  "title": "Flux.1 Image (FAL.ai)",
-  "overviewMarkdown": "## Flux.1 Image (FAL.ai)\n\nGenerate images using Flux.1 models (pro / dev / schnell) via the FAL.ai API.\n\nYou must provide your FAL API key in the plugin settings.\n",
-  "authenticationType": "AUTH_TYPE_NONE",
-  "userSettings": [
+  "description": "Generate images with Flux (Pro / Dev / Schnell) via the FAL.ai API inside TypingMind.",
+  "author": "King",
+  "apiVersion": "v1",
+  "settings": [
     {
       "name": "falApiKey",
-      "type": "password",
-      "label": "FAL.ai API Key",
-      "required": true,
-      "description": "Enter your FAL.ai API key from the fal.ai dashboard."
+      "type": "string",
+      "label": "FAL API Key",
+      "placeholder": "fal_xxx...",
+      "secret": true,
+      "required": true
     },
     {
       "name": "defaultModel",
-      "type": "select",
+      "type": "enum",
       "label": "Default Flux model",
-      "required": true,
-      "description": "Choose which Flux.1 model to use by default.",
-      "options": ["flux-pro", "flux-dev", "flux-schnell"],
+      "values": ["flux-pro", "flux-dev", "flux-schnell"],
       "defaultValue": "flux-pro"
     },
     {
-      "name": "width",
+      "name": "defaultWidth",
       "type": "number",
-      "label": "Image width",
-      "required": false,
-      "description": "Image width in pixels.",
+      "label": "Default width",
       "defaultValue": 1024
     },
     {
-      "name": "height",
+      "name": "defaultHeight",
       "type": "number",
-      "label": "Image height",
-      "required": false,
-      "description": "Image height in pixels.",
+      "label": "Default height",
       "defaultValue": 1024
     }
   ],
-  "dynamicContextEndpoints": [],
   "pluginFunctions": [
     {
       "id": "generate_flux_image",
-      "name": "Generate Flux Image",
-      "implementationType": "javascript",
-      "outputType": "render_markdown",
-      "code": "",
+      "type": "tool",
+      "displayName": "Generate Flux Image",
+      "description": "Generate an image using Flux via FAL.ai.",
       "openaiSpec": {
         "name": "generate_flux_image",
-        "description": "Generate an image using a Flux.1 model via the FAL.ai API.",
+        "description": "Generate an image from a text prompt using the Flux model on FAL.ai.",
         "parameters": {
           "type": "object",
           "properties": {
             "prompt": {
               "type": "string",
-              "description": "Main description of the image you want to create."
+              "description": "The text prompt describing the image to generate."
+            },
+            "model": {
+              "type": "string",
+              "description": "Optional Flux model override: flux-pro, flux-dev, or flux-schnell.",
+              "enum": ["flux-pro", "flux-dev", "flux-schnell"]
+            },
+            "width": {
+              "type": "number",
+              "description": "Optional image width in pixels."
+            },
+            "height": {
+              "type": "number",
+              "description": "Optional image height in pixels."
             }
           },
           "required": ["prompt"]
         }
-      }
+      },
+      "code": "async function generate_flux_image(params, userSettings) {\n  // --- 1. Read inputs from TypingMind ---\n  const apiKey = userSettings.falApiKey;\n  if (!apiKey) {\n    throw new Error('FAL API key is missing. Please add it in the plugin settings.');\n  }\n\n  const prompt = params.prompt;\n  if (!prompt) {\n    throw new Error('Prompt is required.');\n  }\n\n  // Model: params.model overrides userSettings.defaultModel\n  const model = params.model || userSettings.defaultModel || 'flux-pro';\n\n  // Size: params.width/height override defaults\n  const width = params.width || userSettings.defaultWidth || 1024;\n  const height = params.height || userSettings.defaultHeight || 1024;\n\n  // --- 2. Choose the FAL endpoint based on model ---\n  // These paths are easy to adjust later if FAL changes naming\n  let modelPath = 'flux-pro';\n  if (model === 'flux-dev') {\n    modelPath = 'flux-dev';\n  } else if (model === 'flux-schnell') {\n    modelPath = 'flux-schnell';\n  }\n\n  const url = `https://fal.run/fal-ai/${modelPath}`;\n\n  // --- 3. Build the request payload ---\n  const body = {\n    prompt: prompt,\n    width: width,\n    height: height\n  };\n\n  // --- 4. Call the FAL API ---\n  const response = await fetch(url, {\n    method: 'POST',\n    headers: {\n      'Content-Type': 'application/json',\n      'Authorization': `Key ${apiKey}`\n    },\n    body: JSON.stringify(body)\n  });\n\n  if (!response.ok) {\n    const text = await response.text();\n    throw new Error(`FAL API error (${response.status}): ${text}`);\n  }\n\n  const data = await response.json();\n\n  // --- 5. Extract image URL from FAL response ---\n  // This is written in a defensive way.\n  // Adjust the exact path once you see the real FAL response shape.\n\n  let imageUrl = null;\n\n  // Common patterns:\n  // - data.image_url\n  // - data.images[0].url\n  // - data.output[0].url\n\n  if (data && typeof data === 'object') {\n    if (data.image_url) {\n      imageUrl = data.image_url;\n    } else if (Array.isArray(data.images) && data.images.length > 0 && data.images[0].url) {\n      imageUrl = data.images[0].url;\n    } else if (Array.isArray(data.output) && data.output.length > 0 && data.output[0].url) {\n      imageUrl = data.output[0].url;\n    }\n  }\n\n  if (!imageUrl) {\n    // If the structure is different, return the whole payload\n    // so you can inspect it inside TypingMind.\n    return {\n      success: false,\n      message: 'Could not find image URL in FAL response. Returning raw response for inspection.',\n      rawResponse: data\n    };\n  }\n\n  // --- 6. Return a simple, useful object back to TypingMind ---\n  return {\n    success: true,\n    modelUsed: model,\n    width: width,\n    height: height,\n    imageUrl: imageUrl\n  };\n}\n"
     }
   ]
 }
