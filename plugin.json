@@ -1,32 +1,26 @@
 {
   "id": "flux-image-generator",
-  "title": "Flux Image Generator",
-  "emoji": "🖼️",
-  "description": "Generate images using Flux models (dev, pro, schnell) via Fal.ai",
-  "author": "King",
+  "name": "Flux Image Generator",
+  "description": "Generate images using Flux models (flux-dev, flux-pro, flux-schnell) via Fal.ai.",
   "version": "1.0.0",
+  "author": "King",
 
-  "api": {
-    "type": "custom"
-  },
-
-  "action": "flux_image_generator",
-
+  "type": "custom-plugin",
   "implementationType": "javascript",
-  "outputType": "render_markdown",
+  "action": "run",
 
   "userSettings": [
     {
       "name": "falKey",
-      "required": true,
-      "type": "password",
       "label": "Fal.ai API Key",
-      "description": "Your Fal.ai API key"
+      "type": "password",
+      "required": true,
+      "description": "Your Fal.ai API key (get it from https://fal.ai)"
     },
     {
       "name": "model",
-      "type": "select",
       "label": "Flux Model",
+      "type": "select",
       "options": [
         { "label": "flux-dev", "value": "flux-dev" },
         { "label": "flux-pro", "value": "flux-pro" },
@@ -36,14 +30,14 @@
     },
     {
       "name": "width",
+      "label": "Width",
       "type": "number",
-      "label": "Image Width",
       "defaultValue": 1024
     },
     {
       "name": "height",
+      "label": "Height",
       "type": "number",
-      "label": "Image Height",
       "defaultValue": 1024
     }
   ],
