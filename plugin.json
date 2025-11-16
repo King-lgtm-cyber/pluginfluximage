@@ -63,5 +63,13 @@
     }
   },
   "implementationType": "javascript",
-  "outputType": "render_markdown"
+  "outputType": "render_markdown",
+  "code": "function escapeMarkdownAlt(text) {\n  if (!text) return \"\";\n  return text\n    .replace(/\\\\/g, \"\\\\\\\\\")\n    .replace(/\\n/g, \" \")\n    .replace(/\\[/g, \"\\\\[\")\n    .replace(/\\]/g, \"\\\\]\")\n    .replace(/</g, \"&lt;\")\n    .replace(/>/g, \"&gt;\");\n}\n\nasync function flux_image_generator(params, userSettings) {\n  const { prompt, negative_prompt = \"\" } = params;\n  const falKey = userSettings.falKey;\n  const model = userSettings.model || \"flux-dev\";\n  const width = userSettings.width || 1024;\n  const height = userSettings.height || 1024;\n  const steps = userSettings.steps || 28;\n  const cfg = userSettings.cfg || 7;\n\n  if (!falKey) {\n    throw new Error(\"Missing FAL API key. Add it in plugin settings.\");\n  }\n\n  const endpoints = {\n    \"flux-dev\": \"https://fal.run/fal-ai/flux-dev\",\n    \"flux-pro\": \"https://fal.run/fal-ai/flux-pro\",\n    \"flux-schnell\": \"https://fal.run/fal-ai/flux-schnell\"\n  };\n\n  const endpoint = endpoints[model];\n  if (!endpoint) {\n    throw new Error(`Unknown model: ${model}`);\n  }\n\n  const payload = {\n    prompt,\n    negative_prompt,\n    width,\n    height,\n    steps,\n    guidance_scale: cfg\n  };\n\n  const response = await fetch(endpoint, {\n    method: \"POST\",\n    headers: {\n      Authorization: `Key ${falKey}`,\n      \"Content-Type\": \"application/json\"\n    },\n    body: JSON.stringify(payload)\n  });\n\n  if (response.status === 401) {\n    throw new Error(\"Invalid FAL API key.\");\n  }\n\n  if (!response.ok) {\n    const errorText = await response.text();\n    throw new Error(errorText);\n  }\n\n  const data = await response.json();\n\n  if (!data.images || data.images.length === 0) {\n    throw new Error(\"No image returned by the Flux API.\");\n  }\n\n  const url = data.images[0].url;\n  const alt = escapeMarkdownAlt(prompt);\n  \n  return `![${alt}](${url})\\n\\n_Note: Save the image within 1 hour, or it will expire._`;\n}"
 }
+```
+
+### **Step 2: Commit the change**
+
+### **Step 3: Install in TypingMind using:**
+```
+https://raw.githubusercontent.com/King-lgtm-cyber/pluginfluximage/main/plugin.json
