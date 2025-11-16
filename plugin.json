@@ -4,6 +4,7 @@
   "description": "Generate images using Flux models (flux-dev, flux-pro, flux-schnell) via Fal.ai.",
   "version": "1.0.0",
   "author": "King",
+  "type": "custom-plugin",
   "api": {
     "type": "custom"
   },
@@ -44,24 +45,3 @@
       "label": "Height",
       "type": "number",
       "default": 1024
-    },
-    {
-      "id": "steps",
-      "label": "Steps",
-      "type": "number",
-      "default": 28
-    },
-    {
-      "id": "cfg",
-      "label": "CFG Scale",
-      "type": "number",
-      "default": 7
-    },
-    {
-      "id": "seed",
-      "label": "Seed",
-      "type": "number",
-      "default": 0
-    }
-  ]
-}
