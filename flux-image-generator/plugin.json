@@ -7,6 +7,7 @@
   "api": {
     "type": "custom"
   },
+  "action": "run",
   "inputs": [
     {
       "id": "model",
@@ -60,8 +61,7 @@
       "id": "seed",
       "label": "Seed",
       "type": "number",
-      "default": 0,
-      "optional": true
+      "default": 0
     }
   ]
 }
