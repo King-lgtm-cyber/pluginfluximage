@@ -1,77 +1,67 @@
 {
   "version": 1,
   "uuid": "e7c9f1b0-3b0d-4d4a-9e33-2a5b7f41f999",
-  "iconURL": "",
   "emoji": "🎨",
+  "iconURL": "",
   "title": "Flux.1 Image (FAL.ai)",
+  "overviewMarkdown": "## Flux.1 Image (FAL.ai)\n\nGenerate images using Flux.1 models (pro / dev / schnell) via the FAL.ai API.\n\nYou must provide your FAL API key in the plugin settings.\n",
+  "authenticationType": "AUTH_TYPE_NONE",
   "userSettings": [
     {
       "name": "falApiKey",
       "type": "password",
       "label": "FAL.ai API Key",
       "required": true,
-      "description": "Enter your FAL.ai API key. You can get it from your fal.ai dashboard."
+      "description": "Enter your FAL.ai API key from the fal.ai dashboard."
     },
     {
       "name": "defaultModel",
+      "type": "select",
       "label": "Default Flux model",
       "required": true,
-      "description": "Choose which Flux.1 model to use by default (flux-pro, flux-dev, or flux-schnell).",
+      "description": "Choose which Flux.1 model to use by default.",
+      "options": ["flux-pro", "flux-dev", "flux-schnell"],
       "defaultValue": "flux-pro"
     },
     {
       "name": "width",
+      "type": "number",
       "label": "Image width",
       "required": false,
       "description": "Image width in pixels.",
-      "defaultValue": "1024"
+      "defaultValue": 1024
     },
     {
       "name": "height",
+      "type": "number",
       "label": "Image height",
       "required": false,
       "description": "Image height in pixels.",
-      "defaultValue": "1024"
+      "defaultValue": 1024
     }
   ],
-  "overviewMarkdown": "## Flux.1 Image (FAL.ai)\\n\\nThis plugin generates images using Flux.1 models via the FAL.ai API.\\n\\n**Requirements**: FAL.ai API key. Enter it in the plugin settings.\\n\\nExample usage:\\n> Create a highly detailed Afrofuturist cityscape at sunset using Flux Pro.",
-  "authenticationType": "AUTH_TYPE_NONE",
   "dynamicContextEndpoints": [],
   "pluginFunctions": [
     {
       "id": "generate_flux_image",
-      "name": "generate_flux_image",
+      "name": "Generate Flux Image",
       "implementationType": "javascript",
+      "outputType": "render_markdown",
+      "code": "",
       "openaiSpec": {
         "name": "generate_flux_image",
-        "description": "Generate an image using a Flux.1 model via FAL.ai.",
+        "description": "Generate an image using a Flux.1 model via the FAL.ai API.",
         "parameters": {
           "type": "object",
           "properties": {
             "prompt": {
               "type": "string",
-              "description": "Main positive prompt describing the image."
-            },
-            "negative_prompt": {
-              "type": "string",
-              "description": "Optional negative prompt describing what to avoid."
-            },
-            "model": {
-              "type": "string",
-              "description": "Optional Flux model: flux-pro, flux-dev, or flux-schnell."
-            },
-            "seed": {
-              "type": "integer",
-              "description": "Optional seed for repeatable results."
+              "description": "Main description of the image you want to create."
             }
           },
-          "required": [
-            "prompt"
-          ]
+          "required": ["prompt"]
         }
-      },
-      "code": "",
-      "outputType": "render_markdown"
+      }
     }
   ]
 }
