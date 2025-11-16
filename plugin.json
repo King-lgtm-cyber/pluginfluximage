@@ -1,1 +1,77 @@
-
+{
+  "version": 1,
+  "uuid": "e7c9f1b0-3b0d-4d4a-9e33-2a5b7f41f999",
+  "iconURL": "",
+  "emoji": "🎨",
+  "title": "Flux.1 Image (FAL.ai)",
+  "userSettings": [
+    {
+      "name": "falApiKey",
+      "type": "password",
+      "label": "FAL.ai API Key",
+      "required": true,
+      "description": "Enter your FAL.ai API key. You can get it from your fal.ai dashboard."
+    },
+    {
+      "name": "defaultModel",
+      "label": "Default Flux model",
+      "required": true,
+      "description": "Choose which Flux.1 model to use by default (flux-pro, flux-dev, or flux-schnell).",
+      "defaultValue": "flux-pro"
+    },
+    {
+      "name": "width",
+      "label": "Image width",
+      "required": false,
+      "description": "Image width in pixels.",
+      "defaultValue": "1024"
+    },
+    {
+      "name": "height",
+      "label": "Image height",
+      "required": false,
+      "description": "Image height in pixels.",
+      "defaultValue": "1024"
+    }
+  ],
+  "overviewMarkdown": "## Flux.1 Image (FAL.ai)\\n\\nThis plugin generates images using Flux.1 models via the FAL.ai API.\\n\\n**Requirements**: FAL.ai API key. Enter it in the plugin settings.\\n\\nExample usage:\\n> Create a highly detailed Afrofuturist cityscape at sunset using Flux Pro.",
+  "authenticationType": "AUTH_TYPE_NONE",
+  "dynamicContextEndpoints": [],
+  "pluginFunctions": [
+    {
+      "id": "generate_flux_image",
+      "name": "generate_flux_image",
+      "implementationType": "javascript",
+      "openaiSpec": {
+        "name": "generate_flux_image",
+        "description": "Generate an image using a Flux.1 model via FAL.ai.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "prompt": {
+              "type": "string",
+              "description": "Main positive prompt describing the image."
+            },
+            "negative_prompt": {
+              "type": "string",
+              "description": "Optional negative prompt describing what to avoid."
+            },
+            "model": {
+              "type": "string",
+              "description": "Optional Flux model: flux-pro, flux-dev, or flux-schnell."
+            },
+            "seed": {
+              "type": "integer",
+              "description": "Optional seed for repeatable results."
+            }
+          },
+          "required": [
+            "prompt"
+          ]
+        }
+      },
+      "code": "",
+      "outputType": "render_markdown"
+    }
+  ]
+}
