@@ -1,22 +1,37 @@
 {
-  "id": "flux_image_generator",
-  "uuid": "d8a44cd1-621f-4b87-bf1b-8c4cb29cbfa0",
-  "emoji": "⚡️",
+  "id": "flux-image-generator",
   "title": "Flux Image Generator",
-  "description": "Generate images using Flux (flux-dev, flux-pro, flux-schnell) via Fal.ai.",
+  "emoji": "🖼️",
+  "description": "Generate images using Flux models (dev, pro, schnell) via Fal.ai",
+  "author": "King",
+  "version": "1.0.0",
+
+  "api": {
+    "type": "custom"
+  },
+
+  "action": "flux_image_generator",
+
+  "implementationType": "javascript",
+  "outputType": "render_markdown",
+
   "userSettings": [
     {
       "name": "falKey",
       "required": true,
       "type": "password",
       "label": "Fal.ai API Key",
-      "description": "Get your Fal.ai API key: https://fal.ai"
+      "description": "Your Fal.ai API key"
     },
     {
       "name": "model",
-      "type": "string",
+      "type": "select",
       "label": "Flux Model",
-      "description": "Choose which Flux model to use (flux-dev, flux-pro, flux-schnell)",
+      "options": [
+        { "label": "flux-dev", "value": "flux-dev" },
+        { "label": "flux-pro", "value": "flux-pro" },
+        { "label": "flux-schnell", "value": "flux-schnell" }
+      ],
       "defaultValue": "flux-dev"
     },
     {
@@ -32,24 +47,18 @@
       "defaultValue": 1024
     }
   ],
-  "openaiSpec": {
-    "name": "flux_image_generator",
-    "description": "Generate an image using Flux via Fal.ai.",
-    "parameters": {
-      "type": "object",
-      "required": ["prompt"],
-      "properties": {
-        "prompt": {
-          "type": "string",
-          "description": "The image prompt"
-        },
-        "negative_prompt": {
-          "type": "string",
-          "description": "Things to avoid"
-        }
-      }
+
+  "inputs": [
+    {
+      "id": "prompt",
+      "label": "Prompt",
+      "type": "text",
+      "required": true
+    },
+    {
+      "id": "negative_prompt",
+      "label": "Negative Prompt",
+      "type": "text"
     }
-  },
-  "implementationType": "javascript",
-  "outputType": "render_markdown"
+  ]
 }
