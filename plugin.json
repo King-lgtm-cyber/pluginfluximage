@@ -1,63 +1,67 @@
 {
-  "id": "flux-image-generator",
-  "name": "Flux Image Generator",
-  "version": "1.0.0",
-  "description": "Generate images using Flux models (flux-dev, flux-pro, flux-schnell) via Fal.ai",
-  "type": "custom-plugin",
-  "implementationType": "javascript",
-  "author": "King",
-
-  "actions": [
-    {
-      "id": "run",
-      "name": "Generate Image",
-      "description": "Generate an image using the selected Flux model.",
-      "inputSchema": {
-        "type": "object",
-        "properties": {
-          "prompt": {
-            "type": "string",
-            "description": "Image description",
-            "required": true
-          },
-          "negative_prompt": {
-            "type": "string",
-            "description": "Things to avoid"
-          }
-        }
-      }
-    }
-  ],
-
+  "id": "flux_image_generator",
+  "uuid": "b8f2bb37-45a4-4c8b-91ae-19c9fc343bcb",
+  "emoji": "🎨",
+  "title": "Flux Image Generator",
+  "description": "Generate images using Flux models (flux-dev, flux-pro, flux-schnell) via Fal.ai.",
   "userSettings": [
     {
       "name": "falKey",
-      "label": "Fal.ai API Key",
+      "label": "FAL API Key",
       "type": "password",
-      "required": true
+      "required": true,
+      "placeholder": "fal-******"
     },
     {
       "name": "model",
       "label": "Flux Model",
-      "type": "select",
-      "options": [
-        { "label": "flux-dev", "value": "flux-dev" },
-        { "label": "flux-pro", "value": "flux-pro" },
-        { "label": "flux-schnell", "value": "flux-schnell" }
-      ],
-      "defaultValue": "flux-dev"
+      "type": "enum",
+      "values": ["flux-dev", "flux-pro", "flux-schnell"],
+      "default": "flux-dev"
     },
     {
       "name": "width",
       "label": "Width",
       "type": "number",
-      "defaultValue": 1024
+      "default": 1024
     },
     {
       "name": "height",
       "label": "Height",
       "type": "number",
-      "defaultValue": 1024
+      "default": 1024
+    },
+    {
+      "name": "steps",
+      "label": "Steps",
+      "type": "number",
+      "default": 28
+    },
+    {
+      "name": "cfg",
+      "label": "CFG Scale",
+      "type": "number",
+      "default": 7
     }
-  ]
+  ],
+  "openaiSpec": {
+    "name": "flux_image_generator",
+    "description": "Generate images using Flux models via FAL.ai.",
+    "parameters": {
+      "type": "object",
+      "required": ["prompt"],
+      "properties": {
+        "prompt": {
+          "type": "string",
+          "description": "Image description"
+        },
+        "negative_prompt": {
+          "type": "string",
+          "description": "Things to avoid in the image"
+        }
+      }
+    }
+  },
+  "implementationType": "javascript",
+  "outputType": "render_markdown"
 }
