@@ -1,4 +1,4 @@
-export async function flux_image_generator(params, context) {
+export async function run(params, context) {
   const prompt = params.prompt;
   const negative = params.negative_prompt || "";
 
