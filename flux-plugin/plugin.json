@@ -1,0 +1,67 @@
+{
+  "id": "flux-image-generator",
+  "name": "Flux Image Generator",
+  "description": "Generate images using Flux models (flux-dev, flux-pro, flux-schnell) via Fal.ai.",
+  "version": "1.0.0",
+  "author": "King",
+  "api": {
+    "type": "custom"
+  },
+  "inputs": [
+    {
+      "id": "model",
+      "label": "Flux Model",
+      "type": "select",
+      "options": [
+        { "label": "flux-dev", "value": "flux-dev" },
+        { "label": "flux-pro", "value": "flux-pro" },
+        { "label": "flux-schnell", "value": "flux-schnell" }
+      ],
+      "default": "flux-dev"
+    },
+    {
+      "id": "prompt",
+      "label": "Prompt",
+      "type": "text",
+      "placeholder": "Describe the image you want to create...",
+      "required": true
+    },
+    {
+      "id": "negative_prompt",
+      "label": "Negative Prompt",
+      "type": "text",
+      "placeholder": "Things to avoid..."
+    },
+    {
+      "id": "width",
+      "label": "Width",
+      "type": "number",
+      "default": 1024
+    },
+    {
+      "id": "height",
+      "label": "Height",
+      "type": "number",
+      "default": 1024
+    },
+    {
+      "id": "steps",
+      "label": "Steps",
+      "type": "number",
+      "default": 28
+    },
+    {
+      "id": "cfg",
+      "label": "CFG Scale",
+      "type": "number",
+      "default": 7
+    },
+    {
+      "id": "seed",
+      "label": "Seed",
+      "type": "number",
+      "default": 0,
+      "optional": true
+    }
+  ]
+}
